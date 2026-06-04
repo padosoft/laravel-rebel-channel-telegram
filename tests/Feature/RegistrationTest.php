@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 use Padosoft\Rebel\Channel\Telegram\Contracts\TelegramGateway;
 use Padosoft\Rebel\Channel\Telegram\Delivery\TelegramDeliveryChannel;
-use Padosoft\Rebel\Channel\Telegram\RebelTelegramServiceProvider;
 use Padosoft\Rebel\Channel\Telegram\Testing\FakeTelegramGateway;
-use Padosoft\Rebel\Channels\Contracts\MessageDeliveryChannel;
 use Padosoft\Rebel\Channels\Enums\Channel;
+use Padosoft\Rebel\Channels\Routing\DeliveryChannelRegistry;
 
 it('registers the delivery channel when a bot token is configured', function (): void {
     // The base TestCase configures a dummy token + fake gateway.
@@ -20,16 +19,13 @@ it('registers the delivery channel when a bot token is configured', function ():
         ->and($channel->supports(Channel::Telegram))->toBeTrue();
 });
 
-it('binds the channel under the MessageDeliveryChannel contract', function (): void {
-    expect(app()->bound(MessageDeliveryChannel::class))->toBeTrue()
-        ->and(app(MessageDeliveryChannel::class))->toBeInstanceOf(TelegramDeliveryChannel::class);
-});
+it('registers the channel into the shared delivery registry keyed telegram', function (): void {
+    $registry = app(DeliveryChannelRegistry::class);
 
-it('tags the channel under the shared delivery tag', function (): void {
-    $tagged = iterator_to_array(app()->tagged(RebelTelegramServiceProvider::DELIVERY_TAG));
-
-    expect($tagged)->toHaveCount(1)
-        ->and($tagged[0])->toBeInstanceOf(TelegramDeliveryChannel::class);
+    expect($registry->has('telegram'))->toBeTrue()
+        ->and($registry->get('telegram'))->toBeInstanceOf(TelegramDeliveryChannel::class)
+        ->and($registry->supporting(Channel::Telegram))
+        ->toContain(app(TelegramDeliveryChannel::class));
 });
 
 it('uses the fake gateway bound in tests rather than building a real one', function (): void {

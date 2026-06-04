@@ -9,7 +9,7 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 use Padosoft\Rebel\Channel\Telegram\Contracts\TelegramGateway;
 use Padosoft\Rebel\Channel\Telegram\Delivery\TelegramDeliveryChannel;
 use Padosoft\Rebel\Channel\Telegram\Gateway\HttpTelegramGateway;
-use Padosoft\Rebel\Channels\Contracts\MessageDeliveryChannel;
+use Padosoft\Rebel\Channels\Routing\DeliveryChannelRegistry;
 use Padosoft\Rebel\Core\Contracts\AuditLogger;
 use Padosoft\Rebel\Core\Contracts\KeyedHasher;
 use Spatie\LaravelPackageTools\Package;
@@ -22,17 +22,12 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
  * The token is read lazily: the package installs cleanly with no Telegram config, and
  * the channel simply does not register until you set TELEGRAM_BOT_TOKEN.
  *
- * There is no dedicated registry for {@see MessageDeliveryChannel} in
- * laravel-rebel-channels (the ProviderRegistry only holds VerificationProviders), so
- * the idiomatic wiring is a container binding: the channel is bound under the
- * MessageDeliveryChannel contract AND tagged `rebel-channels.delivery`, so the host
- * app can resolve a single delivery channel or `tagged()` them all.
+ * The channel registers itself into the shared {@see DeliveryChannelRegistry} (provided
+ * by laravel-rebel-channels) keyed by `telegram`, so it coexists with every other
+ * delivery channel (Discord, Twilio, ...) and the admin panel can enumerate them all.
  */
 final class RebelTelegramServiceProvider extends PackageServiceProvider
 {
-    /** Container tag under which every Rebel message-delivery channel registers. */
-    public const DELIVERY_TAG = 'rebel-channels.delivery';
-
     public function configurePackage(Package $package): void
     {
         $package
@@ -74,13 +69,12 @@ final class RebelTelegramServiceProvider extends PackageServiceProvider
             );
         });
 
-        // Expose it under the channel contract and the shared delivery tag so the host
-        // app can resolve it idiomatically.
-        if (! $this->app->bound(MessageDeliveryChannel::class)) {
-            $this->app->alias(TelegramDeliveryChannel::class, MessageDeliveryChannel::class);
+        // Register into the shared delivery registry (keyed 'telegram') so it coexists
+        // with every other delivery channel instead of fighting over one contract binding.
+        if (class_exists(DeliveryChannelRegistry::class) && $this->app->bound(DeliveryChannelRegistry::class)) {
+            $this->app->make(DeliveryChannelRegistry::class)
+                ->register($this->app->make(TelegramDeliveryChannel::class));
         }
-
-        $this->app->tag([TelegramDeliveryChannel::class], self::DELIVERY_TAG);
     }
 
     private function botToken(Repository $config): string
