@@ -1,14 +1,31 @@
 {
     "name": "padosoft/laravel-rebel-channel-telegram",
-    "description": "Telegram channel provider for Laravel Rebel Channels.",
-    "keywords": ["laravel", "authentication", "padosoft", "rebel"],
-    "homepage": "https://github.com/padosoft/laravel-rebel-channel-telegram",
+    "description": "Telegram bot delivery channel for Laravel Rebel Channels: deliver OTP codes and security alerts to a Telegram chat. Part of padosoft/laravel-rebel-*.",
     "license": "MIT",
-    "authors": [ { "name": "Padosoft", "email": "support@padosoft.com", "homepage": "https://www.padosoft.com" } ],
+    "keywords": [
+        "laravel",
+        "authentication",
+        "telegram",
+        "bot",
+        "otp",
+        "alerts",
+        "padosoft",
+        "rebel"
+    ],
+    "homepage": "https://github.com/padosoft/laravel-rebel-channel-telegram",
+    "authors": [
+        {
+            "name": "Padosoft",
+            "email": "support@padosoft.com",
+            "homepage": "https://www.padosoft.com"
+        }
+    ],
     "require": {
         "php": "^8.3",
         "illuminate/contracts": "^12.0|^13.0",
         "illuminate/support": "^12.0|^13.0",
+        "padosoft/laravel-rebel-core": "^0.1",
+        "padosoft/laravel-rebel-channels": "^0.1",
         "spatie/laravel-package-tools": "^1.92"
     },
     "require-dev": {
@@ -18,10 +35,40 @@
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0"
     },
-    "autoload": { "psr-4": { "Padosoft\\Rebel\\Channel\\Telegram\\": "src/" } },
-    "autoload-dev": { "psr-4": { "Padosoft\\Rebel\\Channel\\Telegram\\Tests\\": "tests/" } },
-    "extra": { "laravel": { "providers": [ "Padosoft\\Rebel\\Channel\\Telegram\\RebelTelegramServiceProvider" ] } },
-    "config": { "sort-packages": true, "allow-plugins": { "pestphp/pest-plugin": true, "phpstan/extension-installer": true } },
+    "autoload": {
+        "psr-4": {
+            "Padosoft\\Rebel\\Channel\\Telegram\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Padosoft\\Rebel\\Channel\\Telegram\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Padosoft\\Rebel\\Channel\\Telegram\\RebelTelegramServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "phpstan": "phpstan analyse --memory-limit=512M",
+        "pint": "pint",
+        "check": [
+            "pint --test",
+            "@phpstan",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
     "minimum-stability": "stable",
     "prefer-stable": true
 }
