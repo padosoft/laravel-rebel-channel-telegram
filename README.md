@@ -1,5 +1,8 @@
 # Laravel Rebel — Telegram Channel
 
+> Official documentation: https://doc.laravel-rebel.padosoft.com
+
+
 > **Deliver OTP codes and security alerts straight to Telegram, the Rebel way.** This package plugs the [Telegram Bot API](https://core.telegram.org/bots/api) into [`laravel-rebel-channels`](https://github.com/padosoft/laravel-rebel-channels) as a `MessageDeliveryChannel` — so a Telegram chat becomes a first-class, **free**, self-hosted delivery target for verification codes and alerts, *plus* Rebel's HMAC'd audit trail and graceful fallback on top. Part of the `padosoft/laravel-rebel-*` suite.
 
 <p align="center">
@@ -300,3 +303,4 @@ composer pint      # code style
 ```
 
 **License:** MIT — see [LICENSE](LICENSE). Part of the [`padosoft/laravel-rebel`](https://github.com/padosoft) suite.
+
